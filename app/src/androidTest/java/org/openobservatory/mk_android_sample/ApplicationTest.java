@@ -1,4 +1,4 @@
-package org.openobservatory.mk_android_sample;
+package org.openobservatory.measurement_kit_android_sample;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "org.openobservatory.mk_android_sample"
+        applicationId "org.openobservatory.measurement_kit_android_sample"
         minSdkVersion 19
         targetSdkVersion 24
         versionCode 1

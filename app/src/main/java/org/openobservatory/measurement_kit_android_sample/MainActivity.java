@@ -1,4 +1,4 @@
-package org.openobservatory.mk_android_sample;
+package org.openobservatory.measurement_kit_android_sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.openobservatory.mk_android_sample" >
+    package="org.openobservatory.measurement_kit_android_sample" >
 
     <application
         android:allowBackup="true"
