@@ -22,6 +22,8 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Menu menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -52,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         // it is resumed by the system. So, this implementation should be safe, unless
         // my understanding is wrong, also in case the UI has been paused.
 
-        // TODO: add simple mechanism to prevent running a test if a test is already running
-        // otherwise we end up stealing the text box to the other running test :)
         EditText editText = (EditText) findViewById(R.id.progress);
         editText.setText("");
         editText = (EditText) findViewById(R.id.log);
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             EditText editText = (EditText) findViewById(R.id.log);
                             editText.append("test complete\n");
+                            menu.setGroupEnabled(R.id.test, true);
                         }
                     });
                 }
@@ -149,10 +151,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clicked_ndt(MenuItem item) {
+        menu.setGroupEnabled(R.id.test, false);
         run(new NdtTest());
     }
 
     public void clicked_http_invalid_request_line(MenuItem item) {
+        menu.setGroupEnabled(R.id.test, false);
         run(new HttpInvalidRequestLineTest());
     }
 }
