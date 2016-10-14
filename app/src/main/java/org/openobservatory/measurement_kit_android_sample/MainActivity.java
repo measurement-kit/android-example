@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         // it is resumed by the system. So, this implementation should be safe, unless
         // my understanding is wrong, also in case the UI has been paused.
 
-        // TODO: add simple mechanism to prevent running a test if a test is already running
-        // otherwise we end up stealing the text box to the other running test :)
         EditText editText = (EditText) findViewById(R.id.progress);
         editText.setText("");
         editText = (EditText) findViewById(R.id.log);
