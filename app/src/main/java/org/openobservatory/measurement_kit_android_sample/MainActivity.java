@@ -159,4 +159,14 @@ public class MainActivity extends AppCompatActivity {
         menu.setGroupEnabled(R.id.test, false);
         run(new HttpInvalidRequestLineTest());
     }
+
+
+    public void clicked_clear(MenuItem item) {
+        EditText editText = (EditText) findViewById(R.id.progress);
+        editText.setText("");
+        editText = (EditText) findViewById(R.id.log);
+        editText.setText("");
+        editText = (EditText) findViewById(R.id.result);
+        editText.setText("");
+    }
 }

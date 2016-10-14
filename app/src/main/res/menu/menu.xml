@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/test"
             android:enabled="true">
         <item android:id="@+id/ndt"
@@ -11,5 +12,8 @@
             android:onClick="clicked_http_invalid_request_line"/>
     </group>
 
-
+    <item android:id="@+id/clear"
+        android:title="Clear"
+        app:showAsAction="ifRoom"
+        android:onClick="clicked_clear"/>
 </menu>
