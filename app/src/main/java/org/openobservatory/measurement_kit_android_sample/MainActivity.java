@@ -22,6 +22,8 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Menu menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -142,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             EditText editText = (EditText) findViewById(R.id.log);
                             editText.append("test complete\n");
+                            menu.setGroupEnabled(R.id.test, true);
                         }
                     });
                 }
@@ -149,10 +153,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clicked_ndt(MenuItem item) {
+        menu.setGroupEnabled(R.id.test, false);
         run(new NdtTest());
     }
 
     public void clicked_http_invalid_request_line(MenuItem item) {
+        menu.setGroupEnabled(R.id.test, false);
         run(new HttpInvalidRequestLineTest());
     }
 }
