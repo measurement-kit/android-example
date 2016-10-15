@@ -2,9 +2,15 @@
 .DS_Store
 .gradle
 /.idea/libraries
+/.idea/tasks.xml
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.idea/misc.xml
+/.idea/gradle.xml
+/.idea/encodings.xml
 /build
 /captures
 /local.properties
 /app/src/main/java/org/openobservatory/measurement_kit/
+/measurement_kit_android-*.tar.bz2
+/measurement_kit_android-*.tar.bz2.asc
