@@ -55,12 +55,12 @@ public class MainActivity extends AppCompatActivity {
         // it is resumed by the system. So, this implementation should be safe, unless
         // my understanding is wrong, also in case the UI has been paused.
 
-        EditText editText = (EditText) findViewById(R.id.progress);
-        editText.setText("");
-        editText = (EditText) findViewById(R.id.log);
-        editText.setText("");
-        editText = (EditText) findViewById(R.id.result);
-        editText.setText("");
+        clear_view();
+
+        // Note: we disable the menu while the test is running to prevent more
+        // than a single test to run at a time; in the future this will be forced
+        // directly by the measurement-kit engine
+        menu.setGroupEnabled(R.id.test, false);
 
         // To start a test you use the following internal DSL:
         test
@@ -151,22 +151,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clicked_ndt(MenuItem item) {
-        menu.setGroupEnabled(R.id.test, false);
         run(new NdtTest());
     }
 
     public void clicked_http_invalid_request_line(MenuItem item) {
-        menu.setGroupEnabled(R.id.test, false);
         run(new HttpInvalidRequestLineTest());
     }
 
-
-    public void clicked_clear(MenuItem item) {
+    private void clear_view() {
         EditText editText = (EditText) findViewById(R.id.progress);
         editText.setText("");
         editText = (EditText) findViewById(R.id.log);
         editText.setText("");
         editText = (EditText) findViewById(R.id.result);
         editText.setText("");
+    }
+
+    public void clicked_clear(MenuItem item) {
+        clear_view();
     }
 }
