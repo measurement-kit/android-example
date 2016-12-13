@@ -10,7 +10,7 @@ import org.openobservatory.measurement_kit.common.LogCallback;
 import org.openobservatory.measurement_kit.common.LogSeverity;
 import org.openobservatory.measurement_kit.nettests.EntryCallback;
 import org.openobservatory.measurement_kit.nettests.HttpInvalidRequestLineTest;
-import org.openobservatory.measurement_kit.nettests.NdtTest;
+import org.openobservatory.measurement_kit.nettests.MultiNdtTest;
 import org.openobservatory.measurement_kit.nettests.OoniTestBase;
 import org.openobservatory.measurement_kit.nettests.TestCompleteCallback;
 
