@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clicked_ndt(MenuItem item) {
-        run(new NdtTest());
+        run(new MultiNdtTest());
     }
 
     public void clicked_http_invalid_request_line(MenuItem item) {
