@@ -30,12 +30,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /*
-            Load the library and copy the _required_ resoures: geoip, geoipasnum and
-            libressl's certificate CA bundle. Without these resources loaded MK and
-            without passing it the path to such resources later, MK is not gonna work.
+            Load the library and copy the _required_ resoures: geoip,
+            and geoipasnum. Without these resources loaded and
+            without passing it the path to such resources later, MK
+            is not gonna work properly.
          */
         LoadLibraryUtils.load_measurement_kit();
-        ResourceUtils.copy_ca_bundle(this, R.raw.cacert);
         ResourceUtils.copy_geoip(this, R.raw.geoip);
         ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
     }
@@ -109,10 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             })
 
-            // Sets the mandatory options without which MK won't work.
-            // XXX: as of v0.3.0 the library throws an exception if the ca-bundle is missing
-            // but the behavior should be more gentle (no crash) in v0.4.0.
-            .set_options("net/ca_bundle_path", ResourceUtils.get_ca_bundle_path(this))
+            // Sets the mandatory options without which MK won't work properly.
             .set_options("geoip_country_path", ResourceUtils.get_geoip_path(this))
             .set_options("geoip_asn_path", ResourceUtils.get_geoip_asnum_path(this))
 
@@ -132,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
             // This redirects the logs to the logcat. In v0.3.x doing that is incompatible with
             // routing the logs through the `on_log` method. In v0.4.x we'll fix this.
             //.use_logcat()
+
+            // This option uses the system's DNS engine rather than using
+            // libevent's engine and manually setting DNS servers. It will
+            // become the default in measurement-kit v0.5.0.
+            .set_options("dns/engine", "system")
 
             // Run the test in a background thread (that's why we can forget about the current
             // object) and call the callback to notify when it is complete
