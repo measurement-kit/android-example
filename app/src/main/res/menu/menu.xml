@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:id="@+id/test"
-            android:enabled="true">
-        <item android:id="@+id/ndt"
-            android:title="NDT"
-            android:onClick="clicked_ndt"/>
-
-        <item android:id="@+id/http_invalid_request_line"
-            android:title="Http Invalid Request Line"
-            android:onClick="clicked_http_invalid_request_line"/>
-    </group>
-
-    <item android:id="@+id/clear"
-        android:title="Clear"
+    <item android:id="@+id/ndt"
+        android:title="Run"
         app:showAsAction="ifRoom"
-        android:onClick="clicked_clear"/>
+        android:onClick="onClicked"/>
 </menu>

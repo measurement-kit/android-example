@@ -6,17 +6,13 @@ package org.openobservatory.measurement_kit_android_sample;
 
 import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
 import org.openobservatory.measurement_kit.android.ResourceUtils;
-import org.openobservatory.measurement_kit.android.TestIdGenerator;
-import org.openobservatory.measurement_kit.android.TestListener;
-import org.openobservatory.measurement_kit.android.TestRunner;
-import org.openobservatory.measurement_kit.common.LogCallback;
 import org.openobservatory.measurement_kit.common.LogSeverity;
-import org.openobservatory.measurement_kit.nettests.EntryCallback;
-import org.openobservatory.measurement_kit.nettests.HttpInvalidRequestLineTest;
 import org.openobservatory.measurement_kit.nettests.MultiNdtTest;
-import org.openobservatory.measurement_kit.nettests.OoniTestBase;
-import org.openobservatory.measurement_kit.nettests.TestCompleteCallback;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,63 +22,80 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String ON_ENTRY_ID = "mk_entry_event";
+    private final String ON_LOG_ID = "mk_log_event";
+    private final String ON_TEST_COMPLETE_ID = "mk_test_complete";
+
+    private EditText entryText;
+    private LocalBroadcastManager lbm;
+    private EditText logText;
     private Menu menu;
-    private TestListener listener;
+    private BroadcastReceiver on_entry;
+    private BroadcastReceiver on_log;
+    private BroadcastReceiver on_test_complete;
+    private EditText progressText;
+
+    /*
+     * onCreate():
+     *     1. get attributes we need
+     *     2. initialize MK
+     *     3. setup event receivers
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-            Load the library and copy the _required_ resources: geoip,
-            and geoipasnum. Without these resources loaded and
-            without passing it the path to such resources later, MK
-            is not gonna work properly.
-         */
+        lbm = LocalBroadcastManager.getInstance(this);
+        entryText = (EditText) findViewById(R.id.result);
+        progressText = (EditText) findViewById(R.id.progress);
+        logText = (EditText) findViewById(R.id.log);
+
         LoadLibraryUtils.load_measurement_kit();
         ResourceUtils.copy_geoip(this, R.raw.geoip);
         ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
 
-        // Allocate listener and declare how it should behave
-        listener =
+        on_entry = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String entry = intent.getStringExtra("entry");
+                entryText.setText(String.format("%s\n", entry));
+            }
+        };
 
-            new TestListener(LocalBroadcastManager.getInstance(this))
+        on_log = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                long verbosity = intent.getLongExtra("verbosity", 0);
+                String message = intent.getStringExtra("message");
+                if ((verbosity & LogSeverity.JSON) != 0) {
+                    progressText.setText(String.format("%s\n", message));
+                } else {
+                    logText.append(message + "\n");
+                }
+            }
+        };
 
-                .on_log(new LogCallback() {
-                    @Override
-                    public void callback(final long verbosity,
-                                         final String message) {
-                        if ((verbosity & LogSeverity.JSON) != 0) {
-                            EditText editText =
-                                (EditText) findViewById(R.id.progress);
-                            editText.setText(message + "\n");
-                        } else {
-                            EditText editText =
-                                (EditText) findViewById(R.id.log);
-                            editText.append(message + "\n");
-                        }
-                    }
-                })
-
-                .on_entry(new EntryCallback() {
-                    @Override
-                    public void callback(final String entry) {
-                        EditText editText =
-                            (EditText) findViewById(R.id.result);
-                        editText.setText(entry + "\n");
-                    }
-                })
-
-                .on_test_complete(new TestCompleteCallback() {
-                    @Override
-                    public void callback() {
-                        EditText editText = (EditText) findViewById(R.id.log);
-                        editText.append("test complete\n");
-                        menu.setGroupEnabled(R.id.test, true);
-                    }
-                });
+        on_test_complete = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                menu.setGroupEnabled(R.id.ndt, true); // allow running again
+            }
+        };
     }
+
+    /*
+     * onCreateOptionsMenu():
+     *     1. do standard menu related activities
+     *     2. save menu to enable/disable it
+     *
+     * Note: "[...] If you've developed for Android 3.0 and higher, the system
+     * calls onCreateOptionsMenu() when starting the activity, in order to show
+     * items to the app bar."
+     *
+     * Source: https://developer.android.com/guide/topics/ui/menus.html
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,27 +104,60 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    /*
+     * onResume(): start receiving test events
+     */
+
     @Override
     protected void onResume() {
         super.onResume();
-        listener.on_resume();
+        lbm.registerReceiver(
+            on_entry, make_intent_filter(ON_ENTRY_ID)
+        );
+        lbm.registerReceiver(
+            on_log, make_intent_filter(ON_LOG_ID)
+        );
+        lbm.registerReceiver(
+            on_test_complete, make_intent_filter(ON_TEST_COMPLETE_ID)
+        );
     }
+
+    private IntentFilter make_intent_filter(String event) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(event);
+        return filter;
+    }
+
+    /*
+     * onPause: stop receiving test events
+     */
 
     @Override
     protected void onPause() {
         super.onPause();
-        listener.on_pause();
+        lbm.unregisterReceiver(on_entry);
+        lbm.unregisterReceiver(on_log);
+        lbm.unregisterReceiver(on_test_complete);
     }
 
-    private void run(TestRunner<OoniTestBase> test) {
-        clear_view();
+    /*
+     * onClicked:
+     *     1. clear view
+     *     2. set menu disabled to prevent concurrent tests
+     *     3. run test
+     */
 
-        // Note: we disable the menu while the test is running to prevent more
-        // than a single test to run at a time; in the future this will be done
-        // directly by the measurement-kit engine
-        menu.setGroupEnabled(R.id.test, false);
+    public void onClicked(MenuItem item) {
+        EditText editText = (EditText) findViewById(R.id.progress);
+        editText.setText("");
+        editText = (EditText) findViewById(R.id.log);
+        editText.setText("");
+        editText = (EditText) findViewById(R.id.result);
+        editText.setText("");
 
-        test
+        menu.setGroupEnabled(R.id.ndt, false);
+
+        new MultiNdtTest()
 
             // Set the level of verbosity of the test. Setting high level
             // of verbosity (e.g. DEBUG2) MAY freeze applications.
@@ -145,37 +191,9 @@ public class MainActivity extends AppCompatActivity {
             // become the default in measurement-kit v0.5.0.
             .set_options("dns/engine", "system")
 
-            // Run the test in a background thread and tell it to emit
-            // events using the selected local broadcast manager
-            .start(LocalBroadcastManager.getInstance(this));
-
-        listener.start(test.getTestId());
-    }
-
-    public void clicked_ndt(MenuItem item) {
-        run(new TestRunner<OoniTestBase>(
-            TestIdGenerator.get_next(),
-            new MultiNdtTest()
-        ));
-    }
-
-    public void clicked_http_invalid_request_line(MenuItem item) {
-        run(new TestRunner<OoniTestBase>(
-            TestIdGenerator.get_next(),
-            new HttpInvalidRequestLineTest()
-        ));
-    }
-
-    private void clear_view() {
-        EditText editText = (EditText) findViewById(R.id.progress);
-        editText.setText("");
-        editText = (EditText) findViewById(R.id.log);
-        editText.setText("");
-        editText = (EditText) findViewById(R.id.result);
-        editText.setText("");
-    }
-
-    public void clicked_clear(MenuItem item) {
-        clear_view();
+            // Configure test to route event through lbm and start it
+            .on_entry(ON_ENTRY_ID, lbm)
+            .on_log(ON_LOG_ID, lbm)
+            .start(ON_TEST_COMPLETE_ID, lbm);
     }
 }
