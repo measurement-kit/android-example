@@ -22,16 +22,20 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String ON_ENTRY_ID = "mk_entry_event";
-    private final String ON_LOG_ID = "mk_log_event";
-    private final String ON_TEST_COMPLETE_ID = "mk_test_complete";
+    private final String ON_ENTRY_ID = "mk_on_entry";
+    private final String ON_EVENT_ID = "mk_on_event";
+    private final String ON_LOG_ID = "mk_on_log";
+    private final String ON_PROGRESS_ID = "mk_on_progress";
+    private final String ON_TEST_COMPLETE_ID = "mk_on_test_complete";
 
     private EditText entryText;
     private LocalBroadcastManager lbm;
     private EditText logText;
     private Menu menu;
     private BroadcastReceiver on_entry;
+    private BroadcastReceiver on_event;
     private BroadcastReceiver on_log;
+    private BroadcastReceiver on_progress;
     private BroadcastReceiver on_test_complete;
     private EditText progressText;
 
@@ -64,16 +68,29 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        on_event = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("message");
+                progressText.setText(String.format("%s\n", message));
+            }
+        };
+
         on_log = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                long verbosity = intent.getLongExtra("verbosity", 0);
+                //long verbosity = intent.getLongExtra("verbosity", 0);
                 String message = intent.getStringExtra("message");
-                if ((verbosity & LogSeverity.JSON) != 0) {
-                    progressText.setText(String.format("%s\n", message));
-                } else {
-                    logText.append(message + "\n");
-                }
+                logText.append(message + "\n");
+            }
+        };
+
+        on_progress = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                double percent = intent.getDoubleExtra("percent", 0.0);
+                String msg = intent.getStringExtra("message");
+                logText.append(percent * 100.0 + "% " + msg + "\n");
             }
         };
 
@@ -115,7 +132,13 @@ public class MainActivity extends AppCompatActivity {
             on_entry, make_intent_filter(ON_ENTRY_ID)
         );
         lbm.registerReceiver(
+            on_event, make_intent_filter(ON_EVENT_ID)
+        );
+        lbm.registerReceiver(
             on_log, make_intent_filter(ON_LOG_ID)
+        );
+        lbm.registerReceiver(
+            on_progress, make_intent_filter(ON_PROGRESS_ID)
         );
         lbm.registerReceiver(
             on_test_complete, make_intent_filter(ON_TEST_COMPLETE_ID)
@@ -136,7 +159,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         lbm.unregisterReceiver(on_entry);
+        lbm.unregisterReceiver(on_event);
         lbm.unregisterReceiver(on_log);
+        lbm.unregisterReceiver(on_progress);
         lbm.unregisterReceiver(on_test_complete);
     }
 
@@ -193,7 +218,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Configure test to route event through lbm and start it
             .on_entry(ON_ENTRY_ID, lbm)
+            .on_event(ON_EVENT_ID, lbm)
             .on_log(ON_LOG_ID, lbm)
+            .on_progress(ON_PROGRESS_ID, lbm)
             .start(ON_TEST_COMPLETE_ID, lbm);
     }
 }
