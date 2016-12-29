@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "org.openobservatory.measurement_kit_android_sample"
-        minSdkVersion 19
+        minSdkVersion 9
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
