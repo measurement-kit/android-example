@@ -8,8 +8,8 @@ android {
         applicationId "org.openobservatory.measurement_kit_android_sample"
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "2.0.2"
     }
     buildTypes {
         release {
