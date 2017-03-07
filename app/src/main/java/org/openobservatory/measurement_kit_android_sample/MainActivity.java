@@ -4,6 +4,7 @@
 
 package org.openobservatory.measurement_kit_android_sample;
 
+import org.openobservatory.measurement_kit.Version;
 import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
 import org.openobservatory.measurement_kit.android.ResourceUtils;
 import org.openobservatory.measurement_kit.common.LogSeverity;
@@ -16,6 +17,7 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         LoadLibraryUtils.load_measurement_kit();
         ResourceUtils.copy_geoip(this, R.raw.geoip);
         ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
+        Log.d("measurement-kit-example", "MK version: " + Version.getVersion());
 
         on_entry = new BroadcastReceiver() {
             @Override
