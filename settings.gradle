@@ -1,1 +1,1 @@
-include ':app', ':measurement_kit'
+include ':app'
