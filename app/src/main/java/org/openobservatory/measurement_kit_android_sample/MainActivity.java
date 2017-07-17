@@ -4,11 +4,11 @@
 
 package org.openobservatory.measurement_kit_android_sample;
 
-import org.openobservatory.measurement_kit.Version;
+import org.openobservatory.measurement_kit.common.Version;
 import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
 import org.openobservatory.measurement_kit.android.ResourceUtils;
 import org.openobservatory.measurement_kit.common.LogSeverity;
-import org.openobservatory.measurement_kit.nettests.MultiNdtTest;
+import org.openobservatory.measurement_kit.nettests.NdtTest;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         LoadLibraryUtils.load_measurement_kit();
         ResourceUtils.copy_geoip(this, R.raw.geoip);
         ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
-        Log.d("measurement-kit-example", "MK version: " + Version.getVersion());
+        Log.d("measurement-kit-example", "MK version: " + Version.version());
 
         on_entry = new BroadcastReceiver() {
             @Override
@@ -185,11 +185,11 @@ public class MainActivity extends AppCompatActivity {
 
         menu.setGroupEnabled(R.id.ndt, false);
 
-        new MultiNdtTest()
+        new NdtTest()
 
             // Set the level of verbosity of the test. Setting high level
             // of verbosity (e.g. DEBUG2) MAY freeze applications.
-            .set_verbosity(LogSeverity.INFO)
+            .set_verbosity(LogSeverity.LOG_INFO)
 
 
             // Set mandatory options without which MK won't work properly.
@@ -213,11 +213,6 @@ public class MainActivity extends AppCompatActivity {
              */
             //.set_output_filepath(path)
             .set_options("no_file_report", "1")
-
-            // This option uses the system's DNS engine rather than using
-            // libevent's engine and manually setting DNS servers. It will
-            // become the default in measurement-kit v0.5.0.
-            .set_options("dns/engine", "system")
 
             // Configure test to route event through lbm and start it
             .on_entry(ON_ENTRY_ID, lbm)
