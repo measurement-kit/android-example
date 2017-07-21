@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
      * onCreate():
      *     1. get attributes we need
      *     2. initialize MK
-     *     3. setup event receivers
      */
 
     @Override
