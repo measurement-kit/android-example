@@ -1,3 +1,0 @@
-#!/bin/sh
-set -e
-gpg2 -u 7733D95B -b --armor ./app/build/outputs/apk/app-debug.apk
