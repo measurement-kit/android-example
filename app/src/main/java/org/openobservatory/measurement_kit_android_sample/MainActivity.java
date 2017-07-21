@@ -4,17 +4,15 @@
 
 package org.openobservatory.measurement_kit_android_sample;
 
+import org.openobservatory.measurement_kit.android.IntentCallback;
+import org.openobservatory.measurement_kit.android.IntentRouter;
 import org.openobservatory.measurement_kit.common.Version;
 import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
 import org.openobservatory.measurement_kit.android.ResourceUtils;
 import org.openobservatory.measurement_kit.common.LogSeverity;
 import org.openobservatory.measurement_kit.nettests.NdtTest;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
+    private final String TAG = "main-activity";
 
     private final String ON_ENTRY_ID = "mk_on_entry";
     private final String ON_EVENT_ID = "mk_on_event";
@@ -31,14 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private final String ON_TEST_COMPLETE_ID = "mk_on_test_complete";
 
     private EditText entryText;
-    private LocalBroadcastManager lbm;
     private EditText logText;
     private Menu menu;
-    private BroadcastReceiver on_entry;
-    private BroadcastReceiver on_event;
-    private BroadcastReceiver on_log;
-    private BroadcastReceiver on_progress;
-    private BroadcastReceiver on_test_complete;
     private EditText progressText;
 
     /*
@@ -53,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lbm = LocalBroadcastManager.getInstance(this);
         entryText = (EditText) findViewById(R.id.result);
         progressText = (EditText) findViewById(R.id.progress);
         logText = (EditText) findViewById(R.id.log);
@@ -61,48 +53,7 @@ public class MainActivity extends AppCompatActivity {
         LoadLibraryUtils.load_measurement_kit();
         ResourceUtils.copy_geoip(this, R.raw.geoip);
         ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
-        Log.d("measurement-kit-example", "MK version: " + Version.version());
-
-        on_entry = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String entry = intent.getStringExtra("entry");
-                entryText.setText(String.format("%s\n", entry));
-            }
-        };
-
-        on_event = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra("message");
-                progressText.setText(String.format("%s\n", message));
-            }
-        };
-
-        on_log = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //long verbosity = intent.getLongExtra("verbosity", 0);
-                String message = intent.getStringExtra("message");
-                logText.append(message + "\n");
-            }
-        };
-
-        on_progress = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                double percent = intent.getDoubleExtra("percent", 0.0);
-                String msg = intent.getStringExtra("message");
-                logText.append(percent * 100.0 + "% " + msg + "\n");
-            }
-        };
-
-        on_test_complete = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                menu.setGroupEnabled(R.id.ndt, true); // allow running again
-            }
-        };
+        Log.d(TAG, "MK version: " + Version.version());
     }
 
     /*
@@ -131,27 +82,49 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        lbm.registerReceiver(
-            on_entry, make_intent_filter(ON_ENTRY_ID)
-        );
-        lbm.registerReceiver(
-            on_event, make_intent_filter(ON_EVENT_ID)
-        );
-        lbm.registerReceiver(
-            on_log, make_intent_filter(ON_LOG_ID)
-        );
-        lbm.registerReceiver(
-            on_progress, make_intent_filter(ON_PROGRESS_ID)
-        );
-        lbm.registerReceiver(
-            on_test_complete, make_intent_filter(ON_TEST_COMPLETE_ID)
-        );
-    }
+        IntentRouter.getInstance(getApplicationContext())
+            .register_handler(TAG, ON_ENTRY_ID,
+                new IntentCallback() {
+                    @Override
+                    public void callback(Intent intent) {
+                        String entry = intent.getStringExtra("entry");
+                        entryText.setText(String.format("%s\n", entry));
+                    }
+                })
+            .register_handler(TAG, ON_EVENT_ID,
+                new IntentCallback() {
+                    @Override
+                    public void callback(Intent intent) {
+                        String message = intent.getStringExtra("message");
+                        progressText.setText(String.format("%s\n", message));
 
-    private IntentFilter make_intent_filter(String event) {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(event);
-        return filter;
+                    }
+                })
+            .register_handler(TAG, ON_LOG_ID,
+                new IntentCallback() {
+                    @Override
+                    public void callback(Intent intent) {
+                        String message = intent.getStringExtra("message");
+                        logText.append(message + "\n");
+                    }
+                })
+            .register_handler(TAG, ON_PROGRESS_ID,
+                new IntentCallback() {
+                    @Override
+                    public void callback(Intent intent) {
+                        double percent = intent.getDoubleExtra("percent", 0.0);
+                        String msg = intent.getStringExtra("message");
+                        logText.append(percent * 100.0 + "% " + msg + "\n");
+                    }
+                })
+            .register_handler(TAG, ON_TEST_COMPLETE_ID,
+                new IntentCallback() {
+                    @Override
+                    public void callback(Intent intent) {
+                        // allow running again
+                        menu.setGroupEnabled(R.id.ndt, true);
+                    }
+                });
     }
 
     /*
@@ -161,11 +134,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        lbm.unregisterReceiver(on_entry);
-        lbm.unregisterReceiver(on_event);
-        lbm.unregisterReceiver(on_log);
-        lbm.unregisterReceiver(on_progress);
-        lbm.unregisterReceiver(on_test_complete);
+        IntentRouter.getInstance(getApplicationContext())
+            .unregister_handler(TAG, ON_ENTRY_ID)
+            .unregister_handler(TAG, ON_EVENT_ID)
+            .unregister_handler(TAG, ON_LOG_ID)
+            .unregister_handler(TAG, ON_PROGRESS_ID)
+            .unregister_handler(TAG, ON_TEST_COMPLETE_ID);
     }
 
     /*
@@ -184,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
         editText.setText("");
 
         menu.setGroupEnabled(R.id.ndt, false);
+
+        IntentRouter router = IntentRouter.getInstance(getApplicationContext());
 
         new NdtTest()
 
@@ -215,10 +191,10 @@ public class MainActivity extends AppCompatActivity {
             .set_options("no_file_report", "1")
 
             // Configure test to route event through lbm and start it
-            .on_entry(ON_ENTRY_ID, lbm)
-            .on_event(ON_EVENT_ID, lbm)
-            .on_log(ON_LOG_ID, lbm)
-            .on_progress(ON_PROGRESS_ID, lbm)
-            .start(ON_TEST_COMPLETE_ID, lbm);
+            .on_entry(ON_ENTRY_ID, router)
+            .on_event(ON_EVENT_ID, router)
+            .on_log(ON_LOG_ID, router)
+            .on_progress(ON_PROGRESS_ID, router)
+            .start(ON_TEST_COMPLETE_ID, router);
     }
 }

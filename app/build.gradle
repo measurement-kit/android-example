@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    compile "org.openobservatory.measurement_kit:android-libs:0.7.0-beta-1"
+    compile "org.openobservatory.measurement_kit:android-libs:0.7.0-beta-4"
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.1.0'
