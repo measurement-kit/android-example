@@ -10,6 +10,7 @@ import org.openobservatory.measurement_kit.common.Version;
 import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
 import org.openobservatory.measurement_kit.android.ResourceUtils;
 import org.openobservatory.measurement_kit.common.LogSeverity;
+import org.openobservatory.measurement_kit.nettests.BaseTest;
 import org.openobservatory.measurement_kit.nettests.NdtTest;
 
 import android.content.Intent;
@@ -149,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
      *     3. run test
      */
 
+    private BaseTest make_test() {
+        // Technically not necessary. Here so that we see whether we
+        // can reduce all tests to a common interface.
+        return new NdtTest();
+    }
+
     public void onClicked(MenuItem item) {
         EditText editText = (EditText) findViewById(R.id.progress);
         editText.setText("");
@@ -161,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         IntentRouter router = IntentRouter.getInstance(getApplicationContext());
 
-        new NdtTest()
+        make_test()
 
             // Set the level of verbosity of the test. Setting high level
             // of verbosity (e.g. DEBUG2) MAY freeze applications.
@@ -190,11 +197,12 @@ public class MainActivity extends AppCompatActivity {
             //.set_output_filepath(path)
             .set_options("no_file_report", "1")
 
-            // Configure test to route event through lbm and start it
+            // Configure test to route event through router and start it
             .on_entry(ON_ENTRY_ID, router)
             .on_event(ON_EVENT_ID, router)
             .on_log(ON_LOG_ID, router)
             .on_progress(ON_PROGRESS_ID, router)
+
             .start(ON_TEST_COMPLETE_ID, router);
     }
 }
