@@ -8,8 +8,8 @@ android {
         applicationId "org.openobservatory.measurement_kit_android_sample"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 12
-        versionName "2.0.10"
+        versionCode 13
+        versionName "2.0.11"
         setProperty("archivesBaseName", "mk-example-$versionName")
     }
     buildTypes {
