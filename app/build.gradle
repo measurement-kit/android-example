@@ -8,8 +8,8 @@ android {
         applicationId "org.openobservatory.measurement_kit_android_sample"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 17
-        versionName "2.0.15"
+        versionCode 18
+        versionName "2.0.16"
         setProperty("archivesBaseName", "mk-example-$versionName")
     }
     buildTypes {
@@ -22,8 +22,8 @@ android {
 }
 
 dependencies {
-    compile "org.openobservatory.measurement_kit:android-libs:0.8.2-1"
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    api "org.openobservatory.measurement_kit:android-libs:0.8.3-1"
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    api 'com.android.support:appcompat-v7:25.1.0'
 }
