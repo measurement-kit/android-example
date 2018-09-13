@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.2'
 
     defaultConfig {
         applicationId "org.openobservatory.measurement_kit_android_sample"
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion 18
+        targetSdkVersion 27
         versionCode 19
         versionName "2.0.17"
         setProperty("archivesBaseName", "mk-example-$versionName")
@@ -25,5 +25,5 @@ dependencies {
     api "org.openobservatory.measurement_kit:android-libs:0.9.0-alpha.9-1-android.1"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    api 'com.android.support:appcompat-v7:25.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
 }
