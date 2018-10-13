@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
             // of verbosity (e.g. DEBUG2) MAY freeze applications.
             .set_verbosity(LogSeverity.LOG_INFO)
 
+            .add_annotation("integration-example", "true")
+            .add_annotation("example-ndt", "true")
 
             // Set mandatory options without which MK won't work properly.
             .set_options("geoip_country_path",
