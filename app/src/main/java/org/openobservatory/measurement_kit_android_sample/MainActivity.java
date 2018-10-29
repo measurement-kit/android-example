@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 ResourceUtils.get_geoip_path(this));
             options.put("geoip_asn_path",
                 ResourceUtils.get_geoip_asnum_path(this));
-            options.put("no_file_report", 1);
+            options.put("no_file_report", true);
             settings.put("log_level", "INFO");
             settings.put("options", options);
             settings.put("name", "Ndt");
