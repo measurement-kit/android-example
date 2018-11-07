@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    api "org.openobservatory.measurement_kit:android-libs:0.9.0-alpha.11-9-android"
+    api "org.openobservatory.measurement_kit:android-libs:0.9.0-beta-android.4"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:27.1.1'

@@ -4,14 +4,13 @@
 
 package org.openobservatory.measurement_kit_android_sample;
 
-import io.ooni.mk.Task;
-import io.ooni.mk.Event;
+import io.ooni.mk.android.MKResources;
+import io.ooni.mk.MKEvent;
+import io.ooni.mk.MKTask;
+import io.ooni.mk.MKVersion;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openobservatory.measurement_kit.common.Version;
-import org.openobservatory.measurement_kit.android.LoadLibraryUtils;
-import org.openobservatory.measurement_kit.android.ResourceUtils;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
         progressText = (EditText) findViewById(R.id.progress);
         logText = (EditText) findViewById(R.id.log);
 
-        LoadLibraryUtils.load_measurement_kit();
-        ResourceUtils.copy_geoip(this, R.raw.geoip);
-        ResourceUtils.copy_geoip_asnum(this, R.raw.geoipasnum);
-        Log.d(TAG, "MK version: " + Version.version());
+        System.loadLibrary("measurement_kit");
+        MKResources.copyCABundle(this, R.raw.cacert);
+        MKResources.copyGeoIPCountryDB(this, R.raw.country);
+        MKResources.copyGeoIPASNDB(this, R.raw.asn);
+        Log.d(TAG, "MK version: " + MKVersion.getVersion());
     }
 
     /*
@@ -87,10 +87,12 @@ public class MainActivity extends AppCompatActivity {
         final JSONObject settings = new JSONObject();
         try {
             JSONObject options = new JSONObject();
+            options.put("net/ca_bundle_path",
+                MKResources.getCABundlePath(this));
             options.put("geoip_country_path",
-                ResourceUtils.get_geoip_path(this));
+                MKResources.getGeoIPCountryDBPath(this));
             options.put("geoip_asn_path",
-                ResourceUtils.get_geoip_asnum_path(this));
+                MKResources.getGeoIPASNDBPath(this));
             options.put("no_file_report", true);
             settings.put("log_level", "INFO");
             settings.put("options", options);
@@ -116,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     // Start the nettest and extract events from its queue.
-                    Task task = Task.startNettest(settings.toString());
+                    MKTask task = MKTask.startNettest(settings.toString());
                     while (!task.isDone()) {
-                        Event evp = task.waitForNextEvent();
+                        MKEvent evp = task.waitForNextEvent();
                         if (evp == null) {
                             Log.w(TAG, "Cannot wait for next event");
                             break;
