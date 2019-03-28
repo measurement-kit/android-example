@@ -5,7 +5,6 @@
 package org.openobservatory.measurement_kit_android_sample;
 
 import io.ooni.mk.android.MKResources;
-import io.ooni.mk.MKEvent;
 import io.ooni.mk.MKTask;
 import io.ooni.mk.MKVersion;
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         MKResources.copyCABundle(this, R.raw.cacert);
         MKResources.copyGeoIPCountryDB(this, R.raw.country);
         MKResources.copyGeoIPASNDB(this, R.raw.asn);
-        Log.d(TAG, "MK version: " + MKVersion.getVersion());
+        Log.d(TAG, "MK version: " + MKVersion.getVersionMK());
     }
 
     /*
@@ -118,14 +117,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     // Start the nettest and extract events from its queue.
-                    MKTask task = MKTask.startNettest(settings.toString());
+                    MKTask task = MKTask.start(settings.toString());
                     while (!task.isDone()) {
-                        MKEvent evp = task.waitForNextEvent();
-                        if (evp == null) {
-                            Log.w(TAG, "Cannot wait for next event");
-                            break;
-                        }
-                        final String serialization = evp.serialize();
+                        final String serialization = task.waitForNextEvent();
                         if (serialization == null) {
                             Log.w(TAG, "Cannot serialize event");
                             break;
