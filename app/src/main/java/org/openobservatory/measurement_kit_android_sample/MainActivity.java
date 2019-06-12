@@ -5,7 +5,7 @@
 package org.openobservatory.measurement_kit_android_sample;
 
 import io.ooni.mk.android.MKResources;
-import io.ooni.mk.MKTask;
+import io.ooni.mk.MKAsyncTask;
 import io.ooni.mk.MKVersion;
 
 import org.json.JSONException;
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     // Start the nettest and extract events from its queue.
-                    MKTask task = MKTask.start(settings.toString());
+                    MKAsyncTask task = MKAsyncTask.start(settings.toString());
                     while (!task.isDone()) {
                         final String serialization = task.waitForNextEvent();
                         if (serialization == null) {
