@@ -1,5 +1,7 @@
 # MeasurementKit Android app
 
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️: archived and unused repository
+
 This application requires Android Studio and uses gradle to fetch
 the version of MeasurementKit specified in `app/build.gradle`.
 
